@@ -1,4 +1,5 @@
 ebin
+deps
 .eunit
 .tags
 .tags_sorted_by_file
@@ -8,3 +9,4 @@ data
 *.swp
 *.swap
 *.swo
+*.beam
