@@ -1,0 +1,13 @@
+{application, emud_tcp,
+ [
+  {description, "TCP proto for emud_system mainly for testing."},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  cowboy
+                 ]},
+  {mod, { emud_tcp_proto, []}},
+  {env, []}
+ ]}.

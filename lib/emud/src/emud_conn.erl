@@ -7,4 +7,3 @@
 
 send(Conn, #msg{cmdref=Ref} = Msg) when is_pid(Conn) ->
     Conn ! {emud_msg, Ref, Msg}.
-

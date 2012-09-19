@@ -2,10 +2,10 @@ SHELL := /bin/bash
 CWD = $(shell pwd)
 EMUD_LIBS = $(CWD)/lib/:$(CWD)/deps/
 
-build: tags
+build: 
 	./rebar compile
 
-test: tags
+test: 
 	for app in lib/*; do cd $$app; ERL_LIBS=$(EMUD_LIBS) test/init.sh; cd -; done
 	ERL_LIBS=$(EMUD_LIBS) ./rebar eunit skip_deps=true
 
@@ -16,7 +16,7 @@ type:
 	typer lib/**/src/
 
 shell: build data
-	erl -env ERL_LIBS "lib/:deps/" -mnesia dir "data" +A 4 -eval "startup:all()."
+	erl -env ERL_LIBS "lib/:deps/" -mnesia dir "data" +A 4 -eval "startup:all()"
 
 tags: 
 	@ctags -R -f .tags --exclude="ebin|\.test|\.eunit" lib/
