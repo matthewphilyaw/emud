@@ -26,22 +26,24 @@ init(LPid, Socket, Trans, _Opts) ->
     recv(State).
 
 parse(State=#state{buffer=Buffer, session=Sess, sess_id=SessId}) ->
-    case erlang:decode_packet(line, Buffer, []) of
+    case erlang:decode_packet(4, Buffer, []) of
         {ok, Message, Rest} ->
             Cmd = emud_tcp_data:decode_cmd({text, Message}),
             emud_sess:handle_cmd(Sess, Cmd#cmd{sessid=SessId}),
 
             %% advance Rest by one so that the newline terminator is swallowed
-            << _First:8, Next/binary >> = Rest,
-            listen(State#state{buffer= << Next/binary >>});
+            %% << _First:8, Next/binary >> = Rest,
+            listen(State#state{buffer= << Rest/binary >>});
 
         {more, _Length} -> listen(State);
         {error, _Reason} -> terminate(State) %% Neeed to close transport.
     end.
 
 listen(State=#state{socket=S, transport=Trans, timeout=T, buffer=Buffer}) ->
+    io:format(user, "listening...", []),
     case Trans:recv(S, 0, T) of
         {ok, Data} -> 
+            io:format(user, "Raw: ~p\n", [Data]), 
             parse(State#state{buffer = << Buffer/binary, Data/binary >>});
         {error, _Reason} -> terminate(State)
     end.
@@ -51,7 +53,9 @@ recv(State=#state{socket=S, transport=Trans}) ->
        {emud_msg, _Ref, Msg} -> 
             Emsg = emud_tcp_data:encode_msg(Msg),
             io:format(user, "Msg to send: ~p\n", [Emsg]),
-            Trans:send(S, [Emsg, << "\n" >>])
+            Length = byte_size(Emsg),
+            io:format(user, "Final: ~p\n", [[<< Length:32 >>, << Emsg/binary >>]]),
+            Trans:send(S, [<< Length:32 >>, << Emsg/binary >> ])
     end,
     recv(State).
 

@@ -97,7 +97,7 @@ handle_call(connect, {Pid, _Tag}, State) ->
     emud_conn:send(Pid, #msg{
         type= welcome, 
         source= server, 
-        text= <<"Welcome to EMUD Login or create new user: ">>
+        text= <<"Welcome to EMUD\nLogin or create new user: ">>
     }),
     {reply, Reply, State};
 
