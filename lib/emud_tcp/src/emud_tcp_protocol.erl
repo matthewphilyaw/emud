@@ -15,7 +15,6 @@
 
 start_link(ListenerPid, Socket, Transport, Opts) ->
     Pid = spawn_link(?MODULE, init, [ListenerPid, Socket, Transport, Opts]),
-    global:register_name(emud_data, Pid),
     {ok, Pid}.
 
 init(LPid, Socket, Trans, _Opts) ->
