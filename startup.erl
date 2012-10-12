@@ -7,7 +7,7 @@ all() ->
     application:start(cowboy),
     application:start(emud_db),
     application:start(emud),
+    application:start(emud_cmd),
     application:start(emud_http),
     application:start(emud_tcp),
     emud_db_install:install().
-
