@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "- TODO Items -"
+for file in $(find . -type f \( ! -name ".*" \)); do
+    if [ -f "$file" ]
+    then
+        awk '$0 ~ /.+TODO - / {$1=$2=$3=""; sub(/^[ \t]+/, "", $0); str=str"\n  -> ("NR") "$0; n++} END { if (n > 0) print " *", FILENAME, "* ", str, "\n"}' $file
+    fi
+done

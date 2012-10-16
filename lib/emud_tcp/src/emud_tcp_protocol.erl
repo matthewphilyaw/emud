@@ -1,6 +1,6 @@
 -module(emud_tcp_protocol).
 -include_lib("emud/include/emud.hrl").
--behaviour(cowboy_protocol).
+-behaviour(ranch_protocol).
 
 -record(state, {
         sess_id,
@@ -19,7 +19,7 @@ start_link(ListenerPid, Socket, Transport, Opts) ->
     {ok, Pid}.
 
 init(LPid, Socket, Trans, _Opts) ->
-    cowboy:accept_ack(LPid),
+    ok = ranch:accept_ack(LPid),
     {ok, SessId, Sess} = emud_srv:connect(),
     State = #state{socket=Socket, timeout=60000, transport=Trans, sess_id=SessId, session=Sess},
     spawn(?MODULE, listen, [State]),
@@ -28,7 +28,7 @@ init(LPid, Socket, Trans, _Opts) ->
 parse(State=#state{buffer=Buffer, session=Sess, sess_id=SessId}) ->
     case erlang:decode_packet(4, Buffer, []) of
         {ok, Message, Rest} ->
-            Cmd = emud_tcp_data:decode_cmd({text, Message}),
+            Cmd = emud_wire:decode_cmd({text, Message}),
             emud_sess:handle_cmd(Sess, Cmd#cmd{sessid=SessId}),
             listen(State#state{buffer= << Rest/binary >>});
         {more, _Length} -> listen(State);
@@ -45,12 +45,12 @@ listen(State=#state{socket=S, transport=Trans, timeout=T, buffer=Buffer}) ->
 recv(State=#state{socket=S, transport=Trans}) ->
     receive
        {emud_msg, _Ref, Msg} -> 
-            Emsg = emud_tcp_data:encode_msg(Msg),
+            Emsg = emud_wire:encode_msg(Msg),
             Length = byte_size(Emsg),
             Trans:send(S, [<< Length:32 >>, << Emsg/binary >> ])
     end,
     recv(State).
 
-terminate(State=#state{socket=Socket, transport=Trans}) ->
+terminate(#state{socket=Socket, transport=Trans}) ->
     Trans:close(Socket),
     ok.

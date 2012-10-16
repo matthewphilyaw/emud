@@ -1,4 +1,4 @@
--module(emud_tcp_data).
+-module(emud_wire).
 
 -include_lib("emud/include/emud.hrl").
 
@@ -12,7 +12,6 @@ decode_cmd({text, Json}) when is_binary(Json) ->
         {_, Text} ->
             emud_cmd_parser:parse(Text) 
     end.
-
 
 encode_msg(Msg) when is_record(Msg, msg) ->
     Fields = lists:map(fun to_json_safe/1, record_info(fields, msg)),
@@ -28,7 +27,6 @@ safeify(Props) ->
 safeify([], Safe) -> Safe;
 safeify([{Key, Value} | More], Safe) ->
     safeify(More, [{to_json_safe(Key), to_json_safe(Value)} | Safe]).
-
 
 to_json_safe(undefined) -> undefined;
 to_json_safe(Value) when is_atom(Value) -> atom_to_binary(Value, utf8);

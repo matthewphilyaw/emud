@@ -17,11 +17,11 @@ start(_StartType, _StartArgs) ->
         ]}
     ],
     %% Name, NbAcceptors, Transport, TransOpts, Protocol, ProtoOpts
-    cowboy:start_listener(emud_http_listener, 100,
-        cowboy_tcp_transport, [{port, 8080}],
+    ranch:start_listener(emud_http_listener, 100,
+        cowboy_tcp, [{port, 8080}],
         cowboy_http_protocol, [{dispatch, Dispatch}]
     ).
 
 stop(_State) ->
-    cowboy:stop_listener(emud_http_listener),
+    ranch:stop_listener(emud_http_listener),
     ok.

@@ -1,0 +1,6 @@
+{application, emud_wire,
+ [
+  {description, "Handles encoding and ecoding to and from the wire formats"},
+  {vsn, "%VSN%"},
+  {modules, [emud_wire]}
+ ]}.
