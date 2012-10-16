@@ -5,7 +5,6 @@
 -export([decode_cmd/1, encode_msg/1]).
 
 decode_cmd({text, Json}) when is_binary(Json) ->
-    io:format(user, "MadeIt: \n", []),
     {ok, {CmdProps}} = json:decode(Json),
     case proplists:lookup(<<"command">>, CmdProps) of
         none -> throw(invalid_cmd);
